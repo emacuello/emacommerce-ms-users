@@ -14,18 +14,19 @@ import { UserDeleteController } from '../controllers/V1/deleteUser/deleteUser.co
 import { UserFindbyIdController } from '../controllers/V1/findOneById/findOneById.controller';
 import { UserUpdateController } from '../controllers/V1/updateUser/updateUser.controller';
 import { envs } from 'src/config/envs';
+import { PrismaClientRepository } from '../../prismaClient/prismaClient';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: USER_SERVICE,
-        transport: Transport.NATS,
-        options: {
-          servers: [envs.NATS_SERVER_URL],
-        },
-      },
-    ]),
+    // ClientsModule.register([
+    //   {
+    //     name: USER_SERVICE,
+    //     transport: Transport.NATS,
+    //     options: {
+    //       servers: [envs.NATS_SERVER_URL],
+    //     },
+    //   },
+    // ]),
   ],
   controllers: [
     UserCreateController,
@@ -41,6 +42,7 @@ import { envs } from 'src/config/envs';
     UserFindOneByIdUseCase,
     UserUpdateUseCase,
     UserMicroservice,
+    PrismaClientRepository,
     {
       provide: UsersRepository,
       useExisting: UserMicroservice,

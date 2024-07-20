@@ -1,39 +1,73 @@
-import { USER_SERVICE } from 'src/utils/ms/msNames';
 import { User } from '../../domain/entities/Users';
 import { UsersRepository } from '../../domain/repository/users.repository';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
-import { Inject } from '@nestjs/common';
 import { Injectable } from 'src/utils/dependencyInject/injectable';
+import { PrismaClientRepository } from '../prismaClient/prismaClient';
+import { ErrorDeleteException } from '../../domain/errors/errorDelete.exception';
+import { ErrorUpdateException } from '../../domain/errors/errorUpdate.exception';
 
 @Injectable()
 export class UserMicroservice extends UsersRepository {
-  constructor(@Inject(USER_SERVICE) private client: ClientProxy) {
+  constructor(private readonly prismaRepository: PrismaClientRepository) {
     super();
   }
 
-  save(user: User): Promise<User> {
-    const result = this.client.send({ cmd: 'createUser' }, user);
-
-    return firstValueFrom(result);
+  async save(user: User): Promise<User> {
+    const data = {
+      name: user.attributes.name,
+      email: user.attributes.email,
+      phone: user.attributes.phone || null,
+      country: user.attributes.country || null,
+      address: user.attributes.address || null,
+      city: user.attributes.city || null,
+      birthdate: user.attributes.birthdate || null,
+    };
+    const result = await this.prismaRepository.user.create({
+      data,
+    });
+    const newUser = new User(result);
+    return newUser;
   }
   async delete(id: string): Promise<string> {
-    const result = this.client.send({ cmd: 'deleteUser' }, id);
-    return firstValueFrom(result);
+    const result = await this.prismaRepository.user.delete({
+      where: {
+        id,
+      },
+    });
+    if (!result) throw new ErrorDeleteException(id);
+    return 'Usuario eliminado con exito';
   }
 
-  findAll(): Promise<User[]> {
-    const result = this.client.send({ cmd: 'findAllUsers' }, {});
-    return firstValueFrom(result);
+  async findAll(): Promise<User[]> {
+    const result = await this.prismaRepository.user.findMany();
+    return result.map((user) => new User(user));
   }
 
-  findById(id: string): Promise<User> {
-    const result = this.client.send({ cmd: 'findUserById' }, id);
-    return firstValueFrom(result);
+  async findById(id: string): Promise<User> {
+    const result = await this.prismaRepository.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    const user = new User(result);
+    return user;
   }
 
   async update(user: User): Promise<string> {
-    const result = this.client.send({ cmd: 'updateUser' }, user);
-    return firstValueFrom(result);
+    const result = this.prismaRepository.user.update({
+      where: {
+        id: user.attributes.id,
+      },
+      data: {
+        name: user.attributes.name,
+        email: user.attributes.email,
+        phone: user.attributes.phone || null,
+        country: user.attributes.country || null,
+        address: user.attributes.address || null,
+        city: user.attributes.city || null,
+        birthdate: user.attributes.birthdate || null,
+      },
+    });
+    if (!result) throw new ErrorUpdateException(user.attributes.id);
+    return 'Usuario actualizado con exito';
   }
 }

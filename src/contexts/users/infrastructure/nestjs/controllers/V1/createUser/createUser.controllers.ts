@@ -1,25 +1,18 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { V1_ROUTES } from '../../routes';
 import { UserCreateUseCase } from 'src/contexts/users/application/userCreate/userCreate.use-case';
 import { UserCreateControllerDto } from './createUser.dto';
 import { PrimitiveUser } from 'src/contexts/users/domain/entities/Users';
 import { ErrorCreateException } from 'src/contexts/users/domain/errors/errorCreate.exception';
-import { RpcException } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 
-@ApiTags(V1_ROUTES.NAME)
 @Controller(V1_ROUTES.BASE)
 export class UserCreateController {
   constructor(private userCreateUseCase: UserCreateUseCase) {}
 
-  @ApiOperation({ summary: 'Crear un nuevo usuario' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Usuario creado correctamente',
-  })
-  @Post()
+  @MessagePattern('createUser')
   async run(
-    @Body() userDto: UserCreateControllerDto,
+    @Payload() userDto: UserCreateControllerDto,
   ): Promise<Partial<PrimitiveUser>> {
     try {
       const user = await this.userCreateUseCase.run(userDto);

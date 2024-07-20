@@ -3,7 +3,7 @@ export interface PrimitiveUser {
   name: string;
   email?: string;
   password?: string;
-  phone: number;
+  phone: number | bigint;
   country: string;
   address: string;
   city: string;
