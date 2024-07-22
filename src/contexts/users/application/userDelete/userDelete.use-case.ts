@@ -9,6 +9,8 @@ export class UserDeleteUseCase {
 
   async run(dto: UserFindDeleteDto): Promise<string> {
     const result = await this.userRepository.delete(dto.id);
+    console.log('USE CASE', Boolean(result));
+
     if (!result) throw new ErrorDeleteException(dto.id);
     return result;
   }

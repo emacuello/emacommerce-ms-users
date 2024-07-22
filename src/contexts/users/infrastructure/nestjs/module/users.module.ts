@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserCreateController } from '../controllers/V1/createUser/createUser.controllers';
-import { UserCreateUseCase } from 'src/contexts/users/application/userCreate/userCreate.use-case';
+import { UserCreateUseCase } from 'src/contexts/users/application/LEGACYuserCreate/userCreate.use-case';
 import { UsersRepository } from 'src/contexts/users/domain/repository/users.repository';
 import { UserMicroservice } from '../../ms/usersMicroservice';
 import { UserDeleteUseCase } from 'src/contexts/users/application/userDelete/userDelete.use-case';

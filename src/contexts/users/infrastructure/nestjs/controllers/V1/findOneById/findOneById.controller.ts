@@ -16,8 +16,7 @@ export class UserFindbyIdController {
     @Payload() id: UserFindOneControllerDto,
   ): Promise<Partial<PrimitiveUser>> {
     try {
-      const result = await this.userFindbyIdUseCase.run(id);
-      return result;
+      return await this.userFindbyIdUseCase.run(id);
     } catch (error) {
       if (error instanceof UserNotFoundException) {
         throw new RpcException(error.message);

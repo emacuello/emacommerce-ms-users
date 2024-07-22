@@ -1,10 +1,11 @@
-import { User } from '../../domain/entities/Users';
+import { UpdateUser, User } from '../../domain/entities/Users';
 import { UsersRepository } from '../../domain/repository/users.repository';
 import { Injectable } from 'src/utils/dependencyInject/injectable';
 import { PrismaClientRepository } from '../prismaClient/prismaClient';
 import { ErrorDeleteException } from '../../domain/errors/errorDelete.exception';
 import { ErrorUpdateException } from '../../domain/errors/errorUpdate.exception';
 import { UserNotFoundEmailorUserException } from '../../domain/errors/not-found.exception';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UserMicroservice extends UsersRepository {
@@ -30,12 +31,20 @@ export class UserMicroservice extends UsersRepository {
     return newUser;
   }
   async delete(id: string): Promise<string> {
-    const result = await this.prismaRepository.user.delete({
+    const result = await this.prismaRepository.user.findUnique({
       where: {
         id,
       },
     });
-    if (!result) throw new ErrorDeleteException(id);
+    if (!result) throw new RpcException('El usuario no existe');
+
+    const deleted = await this.prismaRepository.user.delete({
+      where: {
+        id,
+      },
+    });
+
+    if (!deleted) throw new ErrorDeleteException(id);
     return 'Usuario eliminado con exito';
   }
 
@@ -57,22 +66,14 @@ export class UserMicroservice extends UsersRepository {
     return user;
   }
 
-  async update(user: User): Promise<string> {
-    const result = this.prismaRepository.user.update({
+  async update(user: UpdateUser, id: string): Promise<string> {
+    const result = await this.prismaRepository.user.update({
       where: {
-        id: user.attributes.id,
+        id: id,
       },
-      data: {
-        name: user.attributes.name,
-        email: user.attributes.email,
-        phone: user.attributes.phone || null,
-        country: user.attributes.country || null,
-        address: user.attributes.address || null,
-        city: user.attributes.city || null,
-        birthdate: user.attributes.birthdate || null,
-      },
+      data: user.toValue(),
     });
-    if (!result) throw new ErrorUpdateException(user.attributes.id);
+    if (!result) throw new ErrorUpdateException(id);
     return 'Usuario actualizado con exito';
   }
 

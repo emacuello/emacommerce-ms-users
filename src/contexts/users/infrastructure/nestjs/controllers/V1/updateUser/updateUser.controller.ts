@@ -12,9 +12,9 @@ export class UserUpdateController {
   @MessagePattern('updateUser')
   async run(@Payload() data: UserUpdateControllerDto): Promise<string> {
     try {
-      const { id, ...rest } = data;
-      const result = await this.userUpdateUseCase.run(rest, id);
-      return result;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, confirmPassword, id, ...rest } = data;
+      return await this.userUpdateUseCase.run(rest, id);
     } catch (error) {
       if (error instanceof ErrorUpdateException) {
         throw new RpcException(error.message);

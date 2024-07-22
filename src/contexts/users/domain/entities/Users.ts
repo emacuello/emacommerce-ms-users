@@ -46,3 +46,15 @@ export class User {
     };
   }
 }
+
+export class UpdateUser {
+  constructor(public readonly attributes: Partial<PrimitiveUser>) {}
+
+  static create(dto: Partial<PrimitiveUser>): UpdateUser {
+    return new UpdateUser(dto);
+  }
+
+  toValue(): Partial<PrimitiveUser> {
+    return this.attributes;
+  }
+}
