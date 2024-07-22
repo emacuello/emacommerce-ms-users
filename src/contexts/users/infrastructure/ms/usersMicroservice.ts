@@ -4,6 +4,7 @@ import { Injectable } from 'src/utils/dependencyInject/injectable';
 import { PrismaClientRepository } from '../prismaClient/prismaClient';
 import { ErrorDeleteException } from '../../domain/errors/errorDelete.exception';
 import { ErrorUpdateException } from '../../domain/errors/errorUpdate.exception';
+import { UserNotFoundEmailorUserException } from '../../domain/errors/not-found.exception';
 
 @Injectable()
 export class UserMicroservice extends UsersRepository {
@@ -15,6 +16,7 @@ export class UserMicroservice extends UsersRepository {
     const data = {
       name: user.attributes.name,
       email: user.attributes.email,
+      username: user.attributes.username || null,
       phone: user.attributes.phone || null,
       country: user.attributes.country || null,
       address: user.attributes.address || null,
@@ -24,7 +26,7 @@ export class UserMicroservice extends UsersRepository {
     const result = await this.prismaRepository.user.create({
       data,
     });
-    const newUser = new User(result);
+    const newUser = new User({ phone: Number(result.phone), ...result });
     return newUser;
   }
   async delete(id: string): Promise<string> {
@@ -39,7 +41,10 @@ export class UserMicroservice extends UsersRepository {
 
   async findAll(): Promise<User[]> {
     const result = await this.prismaRepository.user.findMany();
-    return result.map((user) => new User(user));
+
+    return result.map(
+      (user) => new User({ phone: Number(user.phone), ...user }),
+    );
   }
 
   async findById(id: string): Promise<User> {
@@ -69,5 +74,17 @@ export class UserMicroservice extends UsersRepository {
     });
     if (!result) throw new ErrorUpdateException(user.attributes.id);
     return 'Usuario actualizado con exito';
+  }
+
+  async getOne(username?: string, email?: string): Promise<User> {
+    const where = username ? { username } : { email };
+    const result = await this.prismaRepository.user.findFirst({
+      where,
+    });
+    if (!result) {
+      throw new UserNotFoundEmailorUserException(email, username);
+    }
+    const user = new User(result);
+    return user;
   }
 }

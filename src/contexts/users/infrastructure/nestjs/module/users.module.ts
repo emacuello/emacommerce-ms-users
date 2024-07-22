@@ -15,6 +15,8 @@ import { UserFindbyIdController } from '../controllers/V1/findOneById/findOneByI
 import { UserUpdateController } from '../controllers/V1/updateUser/updateUser.controller';
 import { envs } from 'src/config/envs';
 import { PrismaClientRepository } from '../../prismaClient/prismaClient';
+import { FindOneController } from '../controllers/V1/findOne/findOne.controller';
+import { GetOneService } from 'src/contexts/users/application/getOne/getOne.service';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { PrismaClientRepository } from '../../prismaClient/prismaClient';
     UserDeleteController,
     UserFindbyIdController,
     UserUpdateController,
+    FindOneController,
   ],
   providers: [
     UserCreateUseCase,
@@ -43,6 +46,7 @@ import { PrismaClientRepository } from '../../prismaClient/prismaClient';
     UserUpdateUseCase,
     UserMicroservice,
     PrismaClientRepository,
+    GetOneService,
     {
       provide: UsersRepository,
       useExisting: UserMicroservice,

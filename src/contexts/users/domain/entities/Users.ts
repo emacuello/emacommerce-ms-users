@@ -2,7 +2,7 @@ export interface PrimitiveUser {
   id?: string;
   name: string;
   email?: string;
-  password?: string;
+  username?: string;
   phone: number | bigint;
   country: string;
   address: string;
@@ -16,8 +16,7 @@ export interface PrimitiveUser {
 interface UserDto {
   name: string;
   email: string;
-  password: string;
-  phone: number;
+  phone: number | bigint;
   country: string;
   address: string;
   city: string;
@@ -34,11 +33,13 @@ export class User {
     return {
       id: this.attributes.id,
       name: this.attributes.name,
+      username: this.attributes.username,
       email: this.attributes.email,
-      phone: this.attributes.phone,
+      phone: Number(this.attributes.phone),
       country: this.attributes.country,
       address: this.attributes.address,
       city: this.attributes.city,
+      role: this.attributes.role,
       birthdate: this.attributes.birthdate,
       createdAt: this.attributes.createdAt,
       updatedAt: this.attributes.updatedAt,

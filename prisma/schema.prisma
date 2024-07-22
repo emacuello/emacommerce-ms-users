@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
   username  String
   email     String
@@ -23,6 +23,8 @@ model User {
   address   String?
   city      String?
   orders    String?
-  role      String  @default("user")
+  role      String   @default("user")
   birthdate String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
