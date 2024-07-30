@@ -8,4 +8,8 @@ RUN npm install
 
 COPY . .
 
-CMD ["npm", "run", "start"]
+COPY start.sh ./
+
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]
