@@ -1,0 +1,6 @@
+services:
+  users-ms:
+    build: .    
+    env_file:
+      - .env
+
